@@ -2,8 +2,10 @@ import csv
 import cv2
 import numpy as np
 
+DATA_PATH = './data/driving/'
+
 rows = []
-with open('./data/driving/driving_log.csv') as driving_data:
+with open(DATA_PATH + 'driving_log.csv') as driving_data:
     reader = csv.reader(driving_data)
     for row in reader:
         rows.append(row)
@@ -12,14 +14,17 @@ images = []
 steering_angles = []
 
 for row in rows:
-    img_path = row[0]
-    img_file_name = img_path.split('/')[-1]
-    img_path = './data/driving/IMG/'
-    image = cv2.imread(img_path + img_file_name)
-    images.append(image)
-
+    IMG_PATH = DATA_PATH + 'IMG/'
+    for i in range(3):
+        img_file_name = row[i].split('/')[-1] # 0:center, 1:left, 2:right
+        image = cv2.imread(IMG_PATH + img_file_name)
+        images.append(image)
+    
+    CORRECTION = 0.2
     steering_angle = float(row[3])
-    steering_angles.append(steering_angle)
+    steering_angle_left = steering_angle + CORRECTION
+    steering_angle_right = steering_angle - CORRECTION
+    steering_angles.extend([steering_angle, steering_angle_left, steering_angle_right])
 
 # Augment data by horizontally flipping the images
 augmented_images = []
@@ -51,6 +56,6 @@ model.add(Dense(64))
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=2)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=1)
 
 model.save('model.h5')
