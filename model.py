@@ -15,7 +15,7 @@ IMG_PATH = DATA_PATH + 'IMG/'
 CAM_CENTER = 0
 CAM_LEFT = 1
 CAM_RIGHT = 2
-DATA_BALANCE = 600
+DATA_BALANCE = 4000
 
 
 # Process csv data
@@ -27,7 +27,7 @@ with open(DATA_PATH + 'driving_log.csv') as driving_data:
     lines = list(reader)
     random.shuffle(lines)
     
-    # Filter out most of the zero angle frames but leave about same amount as the non-zero angle frames
+    # Filter out some of the zero angle frames to balance the non-zero angle frames
     zero_angle_count = 0
     for line in lines:
         if float(line[3]) == 0.0 and zero_angle_count < DATA_BALANCE:
